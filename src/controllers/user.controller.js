@@ -24,27 +24,39 @@ const registerUser=asyncHandler( async(req,res)=>{
         throw new ApiError(400,"All fields are required");
     }
 
-    const existedUser = User.findOne({
+    console.log("1-controller reached");
+    
+
+    const existedUser =await User.findOne({
         $or:[{ username },{ email }]
     })
     if(existedUser){
-        throw ApiError(409,"User with wmail or username alreaady exists")
+        throw new ApiError(409,"User with email or username alreaady exists")
     }
 
-    const avatarLocalPath= req.files?.avatar[0]?.path;
-    const coverImageLocalPath= req.files?.coverImage[0]?.path;
+    const avatarLocalPath= req.files?.avatar?.[0]?.path;
+    const coverImageLocalPath= req.files?.coverImage?.[0]?.path;
 
     if(!avatarLocalPath){
         throw new ApiError(400,"Avatar file is required")
     }
-
+    
+    console.log("2-database vhecked");
+    
     const avatar=await uploadOnCloudinary(avatarLocalPath)
-    const coverImage=await uploadOnCloudinary(coverImageLocalPath)
+
+    console.log("3-avatar uploaded");
+    
+    const coverImage=coverImageLocalPath
+    ? await uploadOnCloudinary(coverImageLocalPath)
+    : null;
 
     if(!avatar){
         throw new ApiError(400,"Avatar file is required")
     }
 
+    console.log("4-cover uploaded");
+    
     const user = await User.create({
         fullname,
         avatar:avatar.url,
@@ -54,6 +66,8 @@ const registerUser=asyncHandler( async(req,res)=>{
         username: username.toLowerCase()
     })
 
+    console.log("5-user created");
+    
     const createdUser=await User.findById(user._id).select(
         "-password -refreshToken"
     )

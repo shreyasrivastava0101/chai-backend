@@ -1,4 +1,4 @@
-class ApiResponse extends Response{
+class ApiResponse{
     constructor(
         statusCode,
         data,

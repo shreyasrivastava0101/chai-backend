@@ -18,5 +18,13 @@ router.route("/register").post(
     registerUser
 )
 
+// router.route("/register").post((req, res) => {
+//     console.log("REGISTER ROUTE HIT");
+
+//     res.status(200).json({
+//         message: "Route is working"
+//     });
+// });
+
 
 export default router;
